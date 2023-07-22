@@ -14,6 +14,8 @@ import com.bm.bankmasrtask.presentation.details.adapter.HistoricalDataAdapter
 import com.bm.bankmasrtask.presentation.details.viewmodel.DetailsViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
+import java.util.Calendar
+import java.time.LocalDate
 
 @AndroidEntryPoint
 class DetailsFragment : BaseFragment() {
@@ -48,7 +50,18 @@ class DetailsFragment : BaseFragment() {
     }
     private fun initViewModel() {
         viewModel = ViewModelProvider(this)[DetailsViewModel::class.java]
-        viewModel.getHistoricalData(accessKey = "e30974634ea8ab00fd58c75b27e4385d",from!!,to!!)
+
+        val endDate = LocalDate.now()
+        val startDate = LocalDate.now().minusDays(3)
+
+        viewModel.getHistoricalData(
+            accessKey = "e30974634ea8ab00fd58c75b27e4385d",
+            fromCurrency = from!!,
+            toCurrency = to!!,
+            startDate = startDate,
+            endDate = endDate
+        )
+
         viewModel.getHistoricalLiveData().observe(viewLifecycleOwner, historicalObserver)
     }
     private fun initRV() {
@@ -60,8 +73,32 @@ class DetailsFragment : BaseFragment() {
             }
             Resource.Status.SUCCESS -> {
                 val historicalData = it.data?.rates
+
                 if (historicalData != null) {
-//                    historicalAdapter.setData(historicalData)
+                    val endDate = Calendar.getInstance().time
+                    val startDate = Calendar.getInstance()
+                    startDate.add(Calendar.DAY_OF_MONTH, -3)
+
+                    val historicalList = mutableListOf<HistoricalDataResponse>()
+                    for (entry in historicalData) {
+                        val historicalDataResponse = HistoricalDataResponse(
+                            base = it.data.base,
+                            date = it.data.date,
+                            historical = it.data.historical,
+                            success = it.data.success,
+                            timestamp = it.data.timestamp,
+                            rates = HistoricalDataResponse.Rates(
+                                mapOf(entry.key to entry.value?.toDouble())
+                            )
+                        )
+                        historicalList.add(historicalDataResponse)
+                    }
+
+                    val filteredData = historicalList.filter {
+                        it.date in startDate.time..endDate
+                    }
+
+                    historicalAdapter.setData(filteredData)
                 } else {
                     handleError("No historical data available")
                 }

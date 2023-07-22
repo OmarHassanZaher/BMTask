@@ -13,20 +13,21 @@ import javax.inject.Inject
 class HistoricalDataAdapter @Inject constructor(
     @ApplicationContext val context: Context,
 
-) : RecyclerView.Adapter<HistoricalDataAdapter.ViewHolder>() {
+    ) : RecyclerView.Adapter<HistoricalDataAdapter.ViewHolder>() {
     private lateinit var binding: DetailsItemBinding
     private var historicalList: ArrayList<HistoricalDataResponse> = ArrayList()
 
     inner class ViewHolder(private val binding: DetailsItemBinding) :
         RecyclerView.ViewHolder(binding.root) {
+
         val from: String? =null
         val to: String? = null
         fun bind(item: HistoricalDataResponse) {
 
             binding.apply {
                 dateTv.text = item.date
-                val fromRate = item.rates?.get(from)
-                val toRate = item.rates?.get(to)
+                val fromRate = (item.rates as? Map<String, Double?>)?.getOrDefault(from, null)
+                val toRate = (item.rates as? Map<String, Double?>)?.getOrDefault(to, null)
                 if (fromRate != null && toRate != null) {
                     rateTv.text = "${toRate} $to = ${fromRate} $from"
                 } else {

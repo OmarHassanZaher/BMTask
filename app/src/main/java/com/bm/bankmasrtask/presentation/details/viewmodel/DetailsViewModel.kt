@@ -19,12 +19,11 @@ class DetailsViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val historicalLiveData: MutableLiveData<Resource<HistoricalDataResponse?>> = MutableLiveData()
-    fun getHistoricalData(accessKey: String, from: String, to: String) = viewModelScope.launch(Dispatchers.IO) {
+
+    fun getHistoricalData(accessKey: String, fromCurrency: String, toCurrency: String, startDate: LocalDate, endDate: LocalDate) = viewModelScope.launch(Dispatchers.IO) {
         try {
             historicalLiveData.postValue((Resource.loading()))
-            val endDate = LocalDate.now()
-            val startDate = endDate.minusDays(2)
-            val result = mHistoricalUseCase.execute(accessKey, from, to, startDate, endDate)
+            val result = mHistoricalUseCase.execute(accessKey, fromCurrency, toCurrency, startDate, endDate)
             historicalLiveData.postValue(result)
         } catch (e: Exception) {
             historicalLiveData.postValue(Resource.domainError(e))

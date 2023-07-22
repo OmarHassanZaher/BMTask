@@ -1,6 +1,6 @@
 package com.bm.bankmasrtask.data.model.response
 
-
+import kotlin.collections.*
 import com.google.gson.annotations.SerializedName
 
 data class HistoricalDataResponse(
@@ -28,11 +28,12 @@ data class HistoricalDataResponse(
         val pLN: Double? = null,
         @SerializedName("USD")
         val uSD: Double? = null
-    ) : Map<String, Double?> by mapOf(
-        "AUD" to aUD,
-        "CAD" to cAD,
-        "MXN" to mXN,
-        "PLN" to pLN,
-        "USD" to uSD
     )
 }
+//        : Map<String, Double?> by mapOf(
+//        "AUD" to aUD,
+//        "CAD" to cAD,
+//        "MXN" to mXN,
+//        "PLN" to pLN,
+//        "USD" to uSD
+//    )
